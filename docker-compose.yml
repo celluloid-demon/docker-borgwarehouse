@@ -22,8 +22,8 @@ services:
   # Apprise is used to send notifications, it's optional. http://apprise:8000 is the URL to use in BorgWarehouse.
   apprise:
     container_name: apprise
-  # image: caronc/apprise       # [REMOVED]
-    image: caronc/apprise:v2.1  # [ADDED]
+  # image: caronc/apprise      # [REMOVED]
+    image: caronc/apprise:2.1  # [ADDED]
     user: 'www-data:www-data'
     restart: unless-stopped # [ADDED]
 
