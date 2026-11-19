@@ -1,0 +1,41 @@
+services:
+  borgwarehouse:
+    container_name: borgwarehouse
+    # If you want to build the image yourself, uncomment the following lines and comment the image line
+    #build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: borgwarehouse/borgwarehouse
+    ports:
+      - '${WEB_SERVER_PORT:?WEB_SERVER_PORT variable missing}:3000'
+      - '${SSH_SERVER_PORT:?SSH_SERVER_PORT variable missing}:22'
+    env_file:
+      - .env
+    volumes:
+      - ${CONFIG_PATH:?CONFIG_PATH variable missing}:/home/borgwarehouse/app/config
+      - ${SSH_PATH:?SSH_PATH variable missing}:/home/borgwarehouse/.ssh
+      - ${SSH_HOST:?SSH_HOST variable missing}:/etc/ssh
+      - ${BORG_REPOSITORY_PATH:?BORG_REPOSITORY_PATH variable missing}:/home/borgwarehouse/repos
+  # Apprise is used to send notifications, it's optional. http://apprise:8000 is the URL to use in BorgWarehouse.
+  apprise:
+    container_name: apprise
+    image: caronc/apprise
+    user: 'www-data:www-data'
+
+  # Supercronic runs the BorgWarehouse cron jobs (status & storage checks).
+  # See: https://borgwarehouse.com/docs/admin-manual/scheduled-tasks/
+  #
+  # Copy crontab.example to crontab, adjust the schedule to your needs,
+  # then uncomment this service.
+  #
+  # cron:
+  #   container_name: borgwarehouse-cron
+  #   image: ghcr.io/aptible/supercronic:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - borgwarehouse
+  #   environment:
+  #     - CRONJOB_KEY=${CRONJOB_KEY:?CRONJOB_KEY variable missing}
+  #   volumes:
+  #     - ./crontab:/app/crontab:ro
+  #   command: /app/crontab
